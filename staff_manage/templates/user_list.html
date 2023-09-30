@@ -3,9 +3,13 @@
 {% block content %}
     <div class="container">
             <div style="margin-bottom: 10px">
-                <a class="btn btn-success" href="#">
+                <a class="btn btn-success" href="/user/add/">
                     <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
                     新建用户
+                </a>
+                <a class="btn btn-success" href="/user/model/form/add/">
+                    <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                    新建用户ModelFrom
                 </a>
             </div>
 
@@ -31,22 +35,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                   {% for item in items %}#
+                   {% for item in items %}
                         <tr>
                             <td>{{ item.id }}</td>
                             <td>{{ item.name }}</td>
-                            <td>{{ item.gender }}</td>
-                            <td>{{ item.age }}</td>
+                            <td>{{ item.get_gender_display }}</td>
                             <td>{{ item.password }}</td>
+                            <td>{{ item.age }}</td>
                             <td>{{ item.salary }}</td>
-                            <td>{{ item.create_time }}</td>
-                            <td>{{ item.depart_id }}</td>
+                            <td>{{ item.create_time|date:"Y-m-d" }}</td>
+                            <td>{{ item.depart.title }}</td>
                             <td>
-                                <a class="btn btn-primary btn-xs" href="#">编辑</a>
-                                <a class="btn btn-danger btn-xs" href="#">删除</a>
+                                <a class="btn btn-primary btn-xs" href="/user/{{ item.id }}/edit/">编辑</a>
+                                <a class="btn btn-danger btn-xs" href="/user/{{ item.id }}/delete/">删除</a>
                             </td>
                         </tr>
-                   {% endfor %}#
+                   {% endfor %}
                 </tbody>
             </table>
 

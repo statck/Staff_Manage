@@ -76,13 +76,9 @@ WSGI_APPLICATION = 'day16.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # }
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'day16',        # 数据库名称
+        'NAME': 'demodb',        # 数据库名称
         'USER': 'root',         # mysql账户名
         'PASSWORD': '123456',   # 密码
         'HOST': 'localhost',    # ip地址
@@ -113,8 +109,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
+# LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-hans'
 TIME_ZONE = 'UTC'
 
 USE_I18N = True

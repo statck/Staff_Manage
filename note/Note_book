@@ -27,3 +27,22 @@
 
 用户管理：
     insert into staff_manage_userinfo(name,password,age,gender,salary,creat_time,depart_id) values('demo'，'123456',25,1,100.56,'2023-09-28',4)
+
+新建用户：
+    原始方式理思路：不会采用（本质）【麻烦】
+    Django组件：
+        Form组件（小简便） + 代码
+        ModelForm组件（最简便）
+
+        问题：
+            1. 用户提交数据未校验
+            2. 错误提示，页面应该具备、
+            3. 页面上，每一个字段都需要我们写一遍
+            4. 关联的数据需要手动获取并展示在页面。
+        初识Form组件：
+            1. views.py
+                字段得自己写，工作量大
+
+        初识ModelForm 【增删改查推荐用】
+            1. models.py
+

@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect , HttpResponse
 from staff_manage import models
+from django.utils.safestring import mark_safe
 # Create your views here.
 def depart_list(request):
     """部门列表"""
@@ -136,27 +137,99 @@ def user_delete(request, nid):
     models.UserInfo.objects.filter(id = nid).delete()
     return redirect("/user/list/")
 
+# import random
 def number_list(request):
     """靓号列表"""
     # 常用搜索操作
-    models.PrettyNum.objects.filter(id=12) # 等于12
-    models.PrettyNum.objects.filter(id__gt=12)  # 大于12
-    models.PrettyNum.objects.filter(id__gte=12)  # 大于等于
-    models.PrettyNum.objects.filter(id__lt=12)  # 小于12
-    models.PrettyNum.objects.filter(id__lte=12)  # 小于等于12
+    # models.PrettyNum.objects.filter(id=12) # 等于12
+    # models.PrettyNum.objects.filter(id__gt=12)  # 大于12
+    # models.PrettyNum.objects.filter(id__gte=12)  # 大于等于
+    # models.PrettyNum.objects.filter(id__lt=12)  # 小于12
+    # models.PrettyNum.objects.filter(id__lte=12)  # 小于等于12
+    #
+    # # 字典的形式进行搜索
+    # data_dict = {"id_lte":12}
+    # models.PrettyNum.objects.filter(**data_dict)
+    # # 字段
+    # models.PrettyNum.objects.filter(mobile="999")  # 等于999
+    # models.PrettyNum.objects.filter(mobile__startswith="999")  # 以999开头
+    # models.PrettyNum.objects.filter(mobile__endswith="999")  # 以999结束
+    # models.PrettyNum.objects.filter(id=12)  # 等于12
+    # mobile_s = 17623453643
+    #
+    # for i in range(300):
+    #     mobile_s = mobile_s + i
+    #     price = 999 + i
+    #     level = random.randint(1, 6)
+    #     status = random.randint(0, 1)
+    #     models.PrettyNum.objects.create(mobile=str(mobile_s), price = price , level=level, status=status)
 
-    # 字典的形式进行搜索
-    data_dict = {"id_lte":12}
-    models.PrettyNum.objects.filter(**data_dict)
-    # 字段
-    models.PrettyNum.objects.filter(mobile="999")  # 等于999
-    models.PrettyNum.objects.filter(mobile__startswith="999")  # 以999开头
-    models.PrettyNum.objects.filter(mobile__endswith="999")  # 以999结束
-    models.PrettyNum.objects.filter(id=12)  # 等于12
+    keyword = request.GET.get("q","")
+    search_dic = {}
+    if keyword:
+        search_dic["mobile__contains"] = keyword
+    # 根据用户想要访问的页码。计算起始位置和终止位置
+    page = int(request.GET.get('page',1))
+    page_size = 100
+    start = (page-1) * page_size
+    end = page * page_size
 
+    all_num = models.PrettyNum.objects.filter(**search_dic).order_by("-level")[start:end]
+    total_count = models.PrettyNum.objects.filter(**search_dic).order_by("-level").count()
+    # 计算出当前页的前五页和后五页
+    # 页码：
+    page_count,div = divmod(total_count, page_size)
+    if div:
+        page_count += 1
+    plus = 5
+    if page_count <= 2 * plus + 1:
+        # 数据库中的数据比较少，都没有达到前后各五页的时候
+        start_page = 1
+        end_page = page_count
+    else:
+        if page <= plus:
+            start_page = 1
+            end_page = 2*plus + 1
+        else:
+            # 当前页大于5
+            # 判断极值  当前页+5 > 大于总页数
+            if (page + plus) > page_count:
+                # 数据库中的数据比较多的时候
+                # 当前页小于5的时候：
+                start_page = page_count - 2 * plus
+                end_page = page_count + 1
+            else:
+                start_page = page - plus
+                end_page = page + plus + 1
 
-    all_num = models.PrettyNum.objects.all().order_by("-level")
-    return render(request , 'number_list.html',{"all_num":all_num})
+    page_str_list = []
+    # 首页
+    first_page = '<li ><a href="?page={}">首页</a></li>'.format(1)
+    page_str_list.append(first_page)
+    # 上一页
+    if page > 1:
+        prev = '<li ><a href="?page={}">上一页</a></li>'.format(page -1)
+    else:
+        prev = '<li ><a href="?page={}">上一页</a></li>'.format(1)
+    page_str_list.append(prev)
+    for i in range(start_page, end_page):
+        if i == page:
+            ele = '<li class="active"><a href="?page={}">{}</a></li>'.format(i,i)
+        else:
+            ele = '<li><a href="?page={}">{}</a></li>'.format(i, i)
+        page_str_list.append(ele)
+    # 后一页
+    if page < page_count:
+        after = '<li ><a href="?page={}">下一页</a></li>'.format(page+1)
+    else:
+        after = '<li ><a href="?page={}">下一页</a></li>'.format(page_count)
+    page_str_list.append(after)
+    # 尾页
+    last_page = '<li ><a href="?page={}">尾页</a></li>'.format(page_count)
+    page_str_list.append(last_page)
+    page_string = mark_safe("".join(page_str_list))
+
+    return render(request , 'number_list.html',{"all_num":all_num , "page_string":page_string})
 
 
 
@@ -178,7 +251,6 @@ class PrettyModelForm(forms.ModelForm):
     def clean_mobile(self):  # 钩子函数
         print(self.instance.pk)
         txt_mobile = self.cleaned_data["mobile"]
-        exits_flag = models.PrettyNum.objects.filter(mobile=txt_mobile).exists()
         exits_flag = models.PrettyNum.objects.exclude(id=self.instance.pk).filter(mobile=txt_mobile).exists()
         if exits_flag:
             raise ValidationError("号码已存在！")

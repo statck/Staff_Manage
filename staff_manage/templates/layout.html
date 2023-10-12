@@ -5,11 +5,14 @@
     <meta charset="UTF-8">
     <title>部门编辑</title>
     <link rel="stylesheet" href="{% static 'plugins/bootstrap-3.4.1-dist/css/bootstrap.min.css' %}">
+    <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.css" rel="stylesheet">
     <style>
         .navvbar{
             border-radius: 0;
         }
     </style>
+{#    预留自定义css模块#}
+    {% block css %}{% endblock %}
 </head>
 <body>
 <nav class="navbar navbar-default">
@@ -46,6 +49,7 @@
 
 <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
 <script src="{% static 'plugins/bootstrap-3.4.1-dist/js/bootstrap.min.js' %}"></script>
-
+{# 预留自定义js模块 #}
+{% block js %} {% endblock %}
 </body>
 </html>
